@@ -49,16 +49,17 @@ def parse_args():
     parser.add_argument('--train_json', type=str, required=True, help="Path to the train dataset JSON file")
     parser.add_argument('--test_json', type=str, required=True, help="Path to the test dataset JSON file")
     
-    parser.add_argument('--whisper_model', type=str, required=True,
-                        help="Choose from 'tiny', 'base', 'small', 'medium', 'large', 'large-v2' or provide your own model path")
+    parser.add_argument('--whisper_model', '-model', type=str, required=True,
+                        help="Choose from 'tiny', 'base', 'small', 'medium', 'large', 'large-v2', 'large-v3', 'large-v3-turbo' or provide your own model path in format example: `openai/whisper-large`")
     
-    parser.add_argument('--batch_size', type=int, default=8, help="Batch size for training and evaluation")
-    parser.add_argument('--gradient_accumulation_steps', type=int, default=1, help="Gradient accumulation steps")
-    parser.add_argument('--learning_rate', type=float, default=2e-5, help="Learning rate for training")
+    parser.add_argument('--batch_size', type=int, default=16, help="Batch size for training and evaluation")
+    parser.add_argument('--gradient_accumulation_steps', '-grad_steps', type=int, default=1, help="Gradient accumulation steps")
+    parser.add_argument('--learning_rate', '-lr', type=float, default=2e-5, help="Learning rate for training")
     parser.add_argument('--warmup_steps', type=int, default=500, help="Warmup steps for learning rate")
-    parser.add_argument('--epochs', type=int, default=10, help="Number of epochs for training")
+    parser.add_argument('--epochs', '-e', type=int, default=10, help="Number of epochs for training")
     
     parser.add_argument('--num_workers', '-w', type=int, default=2, help="Num of cpu workers")
+
     return parser.parse_args()
 
 def main():
@@ -153,7 +154,6 @@ def main():
 
     metric = evaluate.load("wer")
 
-
     # Training arguments
     training_args = Seq2SeqTrainingArguments(
         output_dir=f"{whisper_model}-personal",
@@ -172,8 +172,9 @@ def main():
         logging_strategy="epoch",
         report_to=["comet_ml", "tensorboard"],
         load_best_model_at_end=True,
-        metric_for_best_model="wer",
+        metric_for_best_model="wer",                
         greater_is_better=False,
+        early_stopping_patience=3,                  # Stop after 3 epochs without improvement
         push_to_hub=True,
     )
 
