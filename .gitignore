@@ -1,0 +1,7 @@
+# Environments
+.env
+env/
+
+# Recordings 
+*.xz
+luluw_recordings/
