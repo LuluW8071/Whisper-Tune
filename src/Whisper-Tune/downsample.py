@@ -56,7 +56,7 @@ def process_dataset(dataset, output_directory, input_audio_dir, output_format, n
                             desc=f"Processing {os.path.basename(output_directory)}"))
 
     results = [result for result in results if result is not None]
-    return results 
+    return results  # Return processed results
 
 def write_json(results, output_json, output_directory):
     dataset = []
@@ -85,7 +85,7 @@ def main(args):
     train_data = data[:split_index]
     test_data = data[split_index:]
 
-    output_directory = os.path.join(args.output_dir, 'downsampled_clips')
+    output_directory = os.path.join(args.output_dir, 'mimic-output')
 
     # Process datasets (all audio files are saved in one directory)
     train_results = process_dataset(train_data, output_directory, input_audio_dir, "flac", args.num_workers)
@@ -98,19 +98,21 @@ def main(args):
     write_json(train_results, train_json, output_directory)
     write_json(test_results, test_json, output_directory)
 
-    print(f"Train and test JSON files saved at {output_directory}")
+    print(f"Train and test JSON files saved at {args.output_dir}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="""
-      Utility script to convert mimic record WAV to FLAC, split train and test data into separate JSON files, 
-      and store all audio files in a single directory. """
-    )
-
+    parser = argparse.ArgumentParser(description=
+                                     """
+                                     Utility script to convert mimic record WAV to FLAC,
+                                     split train and test data into separate JSON files,
+                                     and store all audio files in a single directory.
+                                     """
+                                     )
     parser.add_argument('--input_file', type=str, required=True,
                         help='Path to the input text file with custom format')
-    parser.add_argument('--output_dir', type=str, required=False, default='',
+    parser.add_argument('--output_dir', type=str, required=True,
                         help='Path to the output directory where audio and JSON files will be created')
-    parser.add_argument('--percent', type=float, default=20,
+    parser.add_argument('--percent', type=float, default=10,
                         help='Percentage of data to use for testing (default: 10)')
     parser.add_argument('--num_workers', '-w', type=int, default=2,
                         help='Number of worker threads for processing (default: 2)')
