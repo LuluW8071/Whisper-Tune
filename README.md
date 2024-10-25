@@ -1,6 +1,18 @@
 # Whisper Tune
 
+<div align="center">
+
+![Code in Progress](https://img.shields.io/badge/status-in_progress-red.svg) ![License](https://img.shields.io/github/license/LuluW8071/Whisper-Tune) ![Open Issues](https://img.shields.io/github/issues/LuluW8071/Whisper-Tune) ![Closed Issues](https://img.shields.io/github/issues-closed/LuluW8071/Whisper-Tune) ![Open PRs](https://img.shields.io/github/issues-pr/LuluW8071/Whisper-Tune) ![Repo Size](https://img.shields.io/github/repo-size/LuluW8071/Whisper-Tune) ![Last Commit](https://img.shields.io/github/last-commit/LuluW8071/Whisper-Tune)
+
+</div>
+
 This repository contains a script to fine-tune OpenAI's Whisper model for automatic speech recognition (ASR). The script allows for training on custom datasets using [__Mimic Recording Studio__](https://github.com/MycroftAI/mimic-recording-studio) and supports multiple Whisper model sizes (`tiny`, `base`, `small`, `medium`, `large`, `large-v2`, `large-v3`, `large-v3-turbo` or other pre-trained whisper models). It also allows for flexibility in batch size, gradient accumulation, learning rate, warmup steps, and number of epochs through command-line arguments.
+
+<div align="center">
+
+![Whisper](https://images.ctfassets.net/kftzwdyauwt9/d9c13138-366f-49d3-a1a563abddc1/8acfb590df46923b021026207ff1a438/asr-summary-of-model-architecture-desktop.svg)
+
+</div>
 
 ## Features
 
@@ -50,9 +62,9 @@ python train.py \
     --test_json test.json \
     --whisper_model tiny \
     --batch_size 8 \
-    --grad_steps 2 \
-    --lr 3e-5 \
-    --warmup_steps 1000 \
+    --grad_steps 1 \
+    --lr 2e-5 \
+    --warmup_steps 200 \
     --epochs 5
     -w 4
 ```
