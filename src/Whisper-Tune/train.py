@@ -156,26 +156,26 @@ def main():
 
     # Training arguments
     training_args = Seq2SeqTrainingArguments(
-        output_dir=f"{whisper_model}-personal",
-        per_device_train_batch_size=args.batch_size,
-        gradient_accumulation_steps=args.gradient_accumulation_steps,
-        learning_rate=args.learning_rate,
-        warmup_steps=args.warmup_steps,
-        num_train_epochs=args.epochs,
-        gradient_checkpointing=True,
-        fp16=True,
-        eval_strategy="epoch",
-        per_device_eval_batch_size=args.batch_size,
-        predict_with_generate=True,
-        generation_max_length=64,
-        save_strategy="epoch",
-        logging_strategy="epoch",
-        report_to=["comet_ml", "tensorboard"],
-        load_best_model_at_end=True,
-        metric_for_best_model="wer",                
-        greater_is_better=False,
-        early_stopping_patience=3,                  # Stop after 3 epochs without improvement
-        push_to_hub=True,
+        output_dir=f"{whisper_model}",                                   # Set the output directory for the model
+        disable_tqdm=False,                                              # Enaisable the progress bar
+        per_device_train_batch_size=args.batch_size,                     # Batch size for training
+        gradient_accumulation_steps=args.gradient_accumulation_steps,    # Gradient accumulation steps
+        learning_rate=args.learning_rate,                                # Learning rate for training
+        warmup_steps=args.warmup_steps,                                  # Warmup steps for learning rate
+        num_train_epochs=args.epochs,                                    # Number of epochs for training
+        gradient_checkpointing=True,                                     # Enable gradient checkpointing
+        fp16=True,                                                       # Enable mixed precision training
+        eval_strategy="epoch",                                           # Evaluation strategy
+        per_device_eval_batch_size=args.batch_size,                      # Batch size for evaluation
+        predict_with_generate=True,                                      # Enable generate prediction
+        generation_max_length=64,                                        # Maximum length of generated text
+        save_strategy="epoch",                                           # Save strategy: epoch
+        logging_strategy="epoch",                                        # Logging strategy: epoch
+        report_to=["comet_ml", "tensorboard"],                           # Report to comet_ml and tensorboard
+        load_best_model_at_end=True,                                     # Load best model at the end of training
+        metric_for_best_model="wer",                                     # Metric: WER for best model 
+        greater_is_better=False,                                         # Less WER is better
+        push_to_hub=True,                                                # Push to the Hugging Face Hub
     )
 
 
@@ -191,6 +191,7 @@ def main():
 
     processor.save_pretrained(training_args.output_dir)
     trainer.train()
+    trainer.evaluate()
 
     kwargs = {
         "dataset": "Personal - Mimic Recording",
