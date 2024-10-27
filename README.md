@@ -6,21 +6,13 @@
 
 </div>
 
-This repository contains a script to fine-tune OpenAI's Whisper model for automatic speech recognition (ASR). The script allows for training on custom datasets using [__Mimic Recording Studio__](https://github.com/MycroftAI/mimic-recording-studio) and supports multiple Whisper model sizes (`tiny`, `base`, `small`, `medium`, `large`, `large-v2`, `large-v3`, `large-v3-turbo` or other pre-trained whisper models). It also allows for flexibility in batch size, gradient accumulation, learning rate, warmup steps, and number of epochs through command-line arguments.
+Fine-tune [__OpenAI’s Whisper model__](https://cdn.openai.com/papers/whisper.pdf) for automatic speech recognition (ASR) on custom datasets. This script supports flexible parameterization, model saving, and experiment tracking. 
 
 <div align="center">
 
 ![Whisper](https://images.ctfassets.net/kftzwdyauwt9/d9c13138-366f-49d3-a1a563abddc1/8acfb590df46923b021026207ff1a438/asr-summary-of-model-architecture-desktop.svg)
 
 </div>
-
-## Features
-
-- Fine-tune OpenAI Whisper models or custom pre-trained models that are finetuned from whisper models.
-- Dataset handling with custom JSON files.
-- Command-line interface (CLI) for adjusting model and training parameters.
-- Support for __Comet ML__ and __TensorBoard__ for logging.
-- Automatic model saving and pushing best model to Hugging Face Hub.
 
 ## Requirements
 
@@ -42,6 +34,32 @@ The model training logs will be pushed to Comet ML for tracking the experiments.
 
 ## Usage
 
+### Collect your own dataset
+
+You can use the [__Mimic Recording Studio__](https://github.com/MycroftAI/mimic-recording-studio) to collect your own dataset.
+
+### 1. Downsample
+
+Downsample the audio files to 16Khz sample rate and change format to FLAC.
+
+```bash
+python downsample.py \
+    --input_file <mimic-audio/backend/path/to/transcript.txt> \ 
+    --output_dir <output/directory> \
+    --percent 20
+```
+
+### 2. Merge
+
+Merge train and test JSON files into a single file.
+
+```bash
+python merge.py \
+    <path/to/train_1.json> <path/to/train_2.json> <path/to/train_3.json> \
+    --output merged_train.json
+```
+
+
 | Argument                        | Description                                                                                       | Default Value   |
 |----------------------------------|---------------------------------------------------------------------------------------------------|-----------------|
 | `--train_json`                   | Path to the training dataset in JSON format.                                                      | N/A             |
@@ -54,35 +72,37 @@ The model training logs will be pushed to Comet ML for tracking the experiments.
 | `--epochs`, `-e`                       | Number of epochs to train for.                                                                    | `10`            |
 | `--num_workers`, `-w`            | Number of CPU workers.                                                                            | `2` |
 
-This table concisely lists the arguments and their corresponding descriptions along with their default values.
-
 ```bash
 python train.py \
-    --train_json train_augmented.json \
-    --test_json test.json \
+    --train_json merged_train.json \
+    --test_json merged_test.json \
     --whisper_model tiny \
     --batch_size 8 \
     --grad_steps 1 \
-    --lr 2e-5 \
-    --warmup_steps 200 \
-    --epochs 5
-    -w 4
+    --lr 1e-4 \
+    --warmup_steps 75 \
+    --epochs 10
+    -w 2
 ```
+
+## Results & Tracking 
+
+_Training logs_, _loss curves_, and _WER_ can be tracked on __Comet ML__ and __TensorBoard__.
+
+| **Model Name**    | **Parameters** | **Eval Loss** | **WER** | **Epochs** | **Batch Size** | **Learning Rate** | **Link** |
+|-------------------|----------------|---------------|---------|------------|----------------|--------------------|------------------------|
+| **Whisper Tiny**       | 39 M             | 0.3751        | 0.1311  | 10         | 4              | 1e-4               | [🤗](https://huggingface.co/luluw/whisper-tiny)  |
+| **Whisper Base**       | 74 M             | 0.2331        | 0.0992  | 10         | 16             | 2e-05              | [🤗](https://huggingface.co/luluw/whisper-base)  |
+| **Whisper Small**      | 224 M            | 0.1889        | 0.0811  | 10         | 16             | 2e-05              | [🤗](https://huggingface.co/luluw/whisper-small) |
+| **Whisper Medium**     | 769 M            | 0.1404        | 0.0645  | 5          | 8              | 2e-05              | [🤗](https://huggingface.co/luluw/whisper-medium) |
+
+
+![WER](assets/eval_wer.png)
+
 
 ## Pushing to Hugging Face Hub 🤗
 
 The script is designed to __automatically push the best trained model to the Hugging Face Hub__. Make sure you have set up your Hugging Face credentials properly.
-
-## Example Dataset Format
-
-Your dataset JSON files should look like this:
-
-```json
-{"path": "path/to/audio/file1.wav", "text": "The transcription of the audio."}
-{"path": "path/to/audio/file2.wav", "text": "Another transcription."}
-```
-
-> Ensure that the audio files are properly referenced.
 
 ## License
 

@@ -1,9 +1,12 @@
 pandas
 numpy
 torch 
+transformers
 torchaudio
 torchvision
 torchaudio
 librosa
 soundfile
 matplotlib
+huggingface_hub[cli]
+comet-ml
