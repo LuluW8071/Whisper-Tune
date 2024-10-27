@@ -84,6 +84,11 @@ def main():
     model.generation_config.language = "english"
     model.generation_config.task = "transcribe"
     model.generation_config.forced_decoder_ids = None
+    model.config.forced_decoder_ids = None
+    model.config.suppress_tokens = []
+
+    # to use gradient checkpointing
+    model.config.use_cache = False
 
 
     feature_extractor = WhisperFeatureExtractor.from_pretrained(whisper_model)
@@ -168,7 +173,7 @@ def main():
         eval_strategy="epoch",                                           # Evaluation strategy
         per_device_eval_batch_size=args.batch_size,                      # Batch size for evaluation
         predict_with_generate=True,                                      # Enable generate prediction
-        generation_max_length=64,                                        # Maximum length of generated text
+        generation_max_length=225,                                        # Maximum length of generated text
         save_strategy="epoch",                                           # Save strategy: epoch
         logging_strategy="epoch",                                        # Logging strategy: epoch
         report_to=["comet_ml", "tensorboard"],                           # Report to comet_ml and tensorboard
